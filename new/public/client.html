@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Page</title>
+</head>
+<style>
+    .sender {
+        background-color: grey; 
+        height: auto; 
+        width: 70%; 
+        padding: 5px; 
+        border-radius: 10px 10px 10px 10px;
+        word-wrap: break-word;
+        margin-bottom: 20px;
+    }
+
+    .sender p {
+        color: white;
+        clear: both;
+    }
+
+    .reader {
+        background-color: black; 
+        height: auto; 
+        width: 70%; 
+        padding: 5px; 
+        border-radius: 10px 10px 10px 10px;
+        word-wrap: break-word;
+        margin-bottom: 20px;
+    }
+
+    .reader p {
+        color: white;
+        clear: both;
+    }
+</style>
+<body style="background: grey;">
+    <div style="height: 700px; width: 500px; margin: 0 auto; margin-top: 50px; background: white; position: relative;">
+        <div style="width: auto; height: 100px; background-color: black;">
+            <h1 style="color: white; padding-top: 10px; padding-left: 10px;">We Are To Help</h1>
+            <p style="color: grey; padding-left: 10px;">Soon someone will join this chat</p>
+        </div>
+        <div style="width: auto; height: 520px; position: inherit; overflow-x: hidden; overflow-y: auto; padding: 10px;" id="chatElem">
+            
+        </div>
+        <div style="width: 500px; height: 80px;">
+            <form style="width: 500px; display: inline-flex;" id="formt">
+                <input type="text" style="height: 40px; width: 400px; bottom: 5px; padding-left: 10px; position: absolute; border: none;" id="message" placeholder="Message"/>
+                <button type="submit" style="position: absolute; right: 0; bottom: 5px;">Send</button>
+            </form>
+        </div>
+    </div>
+</body>
+<script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script>
+<script src="https://cdn.socket.io/4.1.2/socket.io.min.js" integrity="sha384-toS6mmwu70G0fw54EGlWWeA4z3dyJ+dlXBtSURSKN4vyRFOcxd3Bzjj/AoOwY+Rg" crossorigin="anonymous"></script>
+<script>
+    const socket = io();
+
+    socket.on('chat_client', function (msg) {
+        const chatElem = document.getElementById('chatElem');
+
+        var div = document.createElement('div');
+        div.className = "sender";
+
+        var p = document.createElement('p');
+        p.innerText = msg;
+        div.appendChild(p);
+        chatElem.appendChild(div);
+    });
+
+    document.getElementById('formt').addEventListener('submit', function (event) {
+        const chatElem = document.getElementById('chatElem');
+        event.preventDefault();
+
+        const chat = document.getElementById('message').value;
+
+        $.ajax({
+            url: 'http://localhost:3000/chat/cs',
+            type: 'POST',
+            contentType: 'json',
+            headers: {
+                'Content-Type': 'application/json',  
+            },
+            data: JSON.stringify({
+                chat,
+            }),
+            success: function (response) {
+                var div = document.createElement('div');
+                div.className = "reader";
+
+                var p = document.createElement('p');
+                p.innerText = chat;
+                div.appendChild(p);
+                chatElem.appendChild(div);
+
+                document.getElementById('message').value = '';
+            },
+        })
+    });
+</script>
+</html>
